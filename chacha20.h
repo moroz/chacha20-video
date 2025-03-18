@@ -14,4 +14,7 @@ typedef struct {
 
 void QROUND(Chacha20 *state, int a, int b, int c, int d);
 
+void chacha20_setup_block(Chacha20 *state, const uint8_t *key,
+                          const uint8_t *nonce, uint32_t block_counter);
+
 #endif
