@@ -18,3 +18,8 @@ void chacha20_qround(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *d) {
   *b ^= *c;
   *b = ROTL32(*b, 7);
 }
+
+inline void QROUND(Chacha20 *state, int a, int b, int c, int d) {
+  chacha20_qround(&state->words[a], &state->words[b], &state->words[c],
+                  &state->words[d]);
+}
