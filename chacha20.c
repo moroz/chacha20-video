@@ -40,3 +40,30 @@ void chacha20_setup_block(Chacha20 *state, const uint8_t *key,
   }
   state->words[12] = block_counter;
 }
+
+static void chacha20_inner_block(Chacha20 *state) {
+  QROUND(state, 0, 4, 8, 12);
+  QROUND(state, 1, 5, 9, 13);
+  QROUND(state, 2, 6, 10, 14);
+  QROUND(state, 3, 7, 11, 15);
+  QROUND(state, 0, 5, 10, 15);
+  QROUND(state, 1, 6, 11, 12);
+  QROUND(state, 2, 7, 8, 13);
+  QROUND(state, 3, 4, 9, 14);
+}
+
+void chacha20_block(Chacha20 *state, const uint8_t *key, const uint8_t *nonce,
+                    uint32_t counter) {
+  chacha20_setup_block(state, key, nonce, counter);
+
+  uint32_t initialState[16];
+  memcpy(initialState, state->words, 16 * sizeof(uint32_t));
+
+  for (int i = 0; i < 10; i++) {
+    chacha20_inner_block(state);
+  }
+
+  for (int i = 0; i < 16; i++) {
+    state->words[i] += initialState[i];
+  }
+}
