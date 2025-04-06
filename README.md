@@ -19,3 +19,9 @@ Then you can run tests using:
 ```shell
 make test
 ```
+
+If you get clangd errors on macOS, you may be able to fixing by generating a `.clangd` configuration file using:
+
+```shell
+make .clangd
+```

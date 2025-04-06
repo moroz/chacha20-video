@@ -9,9 +9,12 @@ ifeq ($(UNAME_S),Darwin)
 	LDFLAGS = -L$(shell brew --prefix cunit)/lib -lcunit
 endif
 
-FORCE: ;
+.clangd: clangd.sh
+	@echo "Generating .clangd"
+	sh ./clangd.sh
 
-test: FORCE chacha20.c chacha20_test.c
-	$(CC) $(CFLAGS) chacha20.c chacha20_test.c -o $@ $(LDFLAGS)
+.PHONY: test
+test: chacha20.c chacha20_test.c
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 	./test
 

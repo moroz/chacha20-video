@@ -3,3 +3,4 @@ main
 *.exe
 test
 /test.dSYM
+.clangd
