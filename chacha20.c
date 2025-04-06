@@ -1,4 +1,5 @@
 #include "chacha20.h"
+#include <stdio.h>
 #include <string.h>
 
 static inline uint32_t ROTL32(uint32_t n, int offset) {
@@ -31,7 +32,7 @@ static uint32_t get_little_endian_word(const uint8_t *vec) {
 
 void chacha20_setup_block(Chacha20 *state, const uint8_t *key,
                           const uint8_t *nonce, uint32_t block_counter) {
-  memcpy(state->words, "expand 32-byte k", 16);
+  memcpy(state->bytes, "expand 32-byte k", 16);
   for (int i = 0; i < 8; i++) {
     state->words[i + 4] = get_little_endian_word(&key[i * 4]);
   }
@@ -65,5 +66,27 @@ void chacha20_block(Chacha20 *state, const uint8_t *key, const uint8_t *nonce,
 
   for (int i = 0; i < 16; i++) {
     state->words[i] += initialState[i];
+  }
+}
+
+void chacha20_encrypt(const uint8_t *key, const uint32_t counter,
+                      const uint8_t *nonce, const uint8_t *plaintext,
+                      const size_t len, uint8_t *dst) {
+  Chacha20 state;
+
+  for (int j = 0, n = len / 64; j < n; j++) {
+    chacha20_block(&state, key, nonce, counter + j);
+    for (int k = 0; k < 64; k++) {
+      dst[j * 64 + k] = plaintext[j * 64 + k] ^ state.bytes[k];
+    }
+  }
+
+  if (len % 64 != 0) {
+    int j = len / 64;
+    chacha20_block(&state, key, nonce, counter + j);
+
+    for (int k = 0, n = len - j * 64; k < n; k++) {
+      dst[j * 64 + k] = plaintext[j * 64 + k] ^ state.bytes[k];
+    }
   }
 }

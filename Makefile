@@ -15,6 +15,6 @@ endif
 
 .PHONY: test
 test: chacha20.c chacha20_test.c
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) -g $^ -o $@ $(LDFLAGS)
 	./test
 
